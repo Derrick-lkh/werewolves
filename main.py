@@ -14,7 +14,7 @@ def main():
 
 @bot.message_handler(commands = ['greet','start'])
 def greet(message):
-    msg = ''' Hello, how are you? '''
+    msg = ''' C4X IS THE WORST '''
     bot.reply_to(message, msg)
 
 
