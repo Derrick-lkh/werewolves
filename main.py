@@ -1,6 +1,7 @@
 import telebot
 import os
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 token = os.getenv('AUT_TOKEN')
