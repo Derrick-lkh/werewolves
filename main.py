@@ -19,6 +19,7 @@ reset_markup = types.ReplyKeyboardRemove(selective=False)
 
 # Game Var
 hacker_target = []
+voting_allowed = False
 
 
 # Define Game functions
@@ -82,19 +83,53 @@ def voting_phase():
             print(Users[i]["dead"])
             pass
         else:
-            option = Users[i]["user_name"]
+            option = "/vote " + str(Users[i]["user_name"])
             markup.row(types.KeyboardButton(option))
-    msg = bot.send_message(room_id, "Please vote:", reply_markup=markup)
-    bot.register_next_step_handler(msg, collate_votes)
+    bot.send_message(room_id, "Please vote:", reply_markup=markup)
+    # bot.register_next_step_handler(msg, collate_votes)
 
 
 collated_votes = []
 
 
+def vote_result():
+    bot.send_message(room_id, "End of Voting", reply_markup=reset_markup)
+    collated_votes.sort()
+    highest_count_user = 0
+    highest_count = 0
+    for i in Users:
+        print(i)
+        count = 0
+        for t in collated_votes:
+            if Users[i]["user_name"] == t:
+                count += 1
+                print(t, count)
+        if highest_count != 0:
+            if count > highest_count:
+                highest_count = count
+                highest_count_user = i
+            elif count == highest_count and highest_count != 0:
+                print("Tie")
+                msg = "TIED! No one was Yeeted \U0001f4a9"
+                bot.send_message(room_id, msg)
+                return
+        else:
+            highest_count = count
+            highest_count_user = i
+    Users[highest_count_user].update({"dead": True})
+    msg = Users[highest_count_user]["user_name"] + " was Yeeted! \U0001f918\n"
+    bot.send_message(room_id, msg)
+
+
+
+
+@bot.message_handler(commands=['vote'])
 def collate_votes(message):
-    collated_votes.append(message.text)
-    msg = str(message.from_user.username) + " voted for " + str(message.text)
-    bot.reply_to(message, msg)
+    global collated_votes
+    if voting_allowed:
+        collated_votes.append(message.text[6:])
+        msg = str(message.from_user.username) + " voted for " + str(message.text)
+        bot.reply_to(message, msg)
 
 
 # Hacker actions
@@ -130,6 +165,7 @@ def join_game(message):
 # Starts game
 @bot.message_handler(commands=['start_game'])
 def start_game(message):
+    global voting_allowed
     msg = '''Starting Game ... ...'''
     bot.reply_to(message, msg)
     random_roles()
@@ -137,8 +173,13 @@ def start_game(message):
     night_actions()
     time.sleep(20)
     collate_night_actions()
+    # Enable voting - initiate voting
+    voting_allowed = True
     voting_phase()
-
+    time.sleep(20)
+    voting_allowed = False
+    vote_result()
+    # Disable voting - End of voting
 
 
 @bot.message_handler(commands=['pm'])
@@ -149,9 +190,7 @@ def pm(message):
 
 
 def test():
-    for i in Users:
-        if "dead" in Users[i].keys():
-            print("dead")
+    vote_result()
 
 
 def main():
