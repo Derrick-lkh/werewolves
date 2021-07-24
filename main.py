@@ -51,16 +51,20 @@ def random_roles():
 def night_actions():
     markup = types.ReplyKeyboardMarkup(row_width=1)
     action_list = []
-    for i in Users:
-        if Users[i]["roles"] != "Hacker":
-            option = Users[i]["user_name"]
+    for t in Users:
+        if Users[t]["roles"] != "Hacker":
+            option = Users[t]["user_name"]
             print(option)
             markup.row(types.KeyboardButton(option))
-    for t in Users:
-        if Users[t]["roles"] == "Hacker":
-            print("Hacker found")
-            msg = bot.send_message(t, "Choose your target:", reply_markup=markup)
-            bot.register_next_step_handler(msg, hack)
+        if "dead" in Users[t].keys():
+            if Users[t]["roles"] == "Hacker":
+                print("Hacker found")
+                msg = bot.send_message(t, "Choose your target:", reply_markup=markup)
+                bot.register_next_step_handler(msg, hack)
+            if Users[t]["roles"] == "FBI":
+                print("FBI found")
+                # msg = bot.send_message(t, "Choose your target:", reply_markup=markup)
+                # bot.register_next_step_handler(detection, FBIDetect)
 
 
 def collate_night_actions():
@@ -164,6 +168,13 @@ def hack(message):
     hacker_target.append(str(message.text))
     msg = "You have selected to hack " + str(message.text)
     bot.reply_to(message, msg, reply_markup=reset_markup)
+
+
+# FBI actions
+def FBIDetect(message):
+    msg = "You have selected to check " + str(message.text) + " he is a "
+    bot.reply_to(message, msg, reply_markup=reset_markup)
+
 
 
 @bot.message_handler(commands=['start'])
