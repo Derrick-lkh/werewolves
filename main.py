@@ -12,18 +12,24 @@ load_dotenv()
 token = os.getenv('AUT')
 bot = telebot.TeleBot(token)
 
-
-# Users = {376517278: {'user_name': 'Derrick_lkh'}, 33540344: {'user_name': 'Mant'}, 341249922: {'user_name': 'AaronPeh'},
-#           718902607: {'user_name': 'None'}}
 Users = {}
 room_id = ""
 Roles = ["Hacker", "FBI", "FBI", "Sage", "Shield", "Civilian", "Civilian", "Civilian", "Civilian"]
 reset_markup = types.ReplyKeyboardRemove(selective=False)
-
 # Game Var
 hacker_target = []
 voting_allowed = False
 Init_game = True
+
+
+def reset_game():
+    global Users, room_id, hacker_target, voting_allowed, Init_game
+    Users = {}
+    room_id = ""
+    # Game Var
+    hacker_target = []
+    voting_allowed = False
+    Init_game = True
 
 
 # Define Game functions
@@ -223,6 +229,7 @@ def FBIDetect(message):
 @bot.message_handler(commands=['start'])
 def init_room(message):
     global room_id
+    reset_game()
     room_id = message.chat.id
     print(room_id)
     msg = '''**C4X Werewolves Started**\nUse /join to enter the game'''
