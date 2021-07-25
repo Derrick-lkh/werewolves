@@ -20,21 +20,23 @@ reset_markup = types.ReplyKeyboardRemove(selective=False)
 hacker_target = []
 voting_allowed = False
 Init_game = True
+collated_votes = []
+VOTED = []
 
 
 def reset_game():
-    global Users, room_id, hacker_target, voting_allowed, Init_game
+    global Users, room_id, hacker_target, voting_allowed, Init_game, collated_votes, VOTED
     Users = {}
     room_id = ""
     # Game Var
-    hacker_target = []
     voting_allowed = False
     Init_game = True
+    hacker_target = []
+    collated_votes = []
+    VOTED = []
 
 
 # Define Game functions
-
-
 def add_to_game(user_name, chat_id):
     print("add to game", chat_id in Users)
     if chat_id in Users:
@@ -120,9 +122,6 @@ def voting_phase():
     # bot.register_next_step_handler(msg, collate_votes)
 
 
-collated_votes = []
-
-
 def vote_result():
     bot.send_message(room_id, "End of Voting", reply_markup=reset_markup)
     if len(collated_votes) == 0:
@@ -187,9 +186,6 @@ def checkCondition():
         msg = str(noOfHackers) + "hackers remain"
         bot.send_message(room_id, msg)
         return True
-
-
-VOTED = []
 
 
 @bot.message_handler(commands=['vote'])
@@ -264,14 +260,17 @@ def start_game(message):
         night_actions()
         time.sleep(10)
         collate_night_actions()
-        checkCondition()
-        # Enable voting - initiate voting
-        voting_allowed = True
-        voting_phase()
-        time.sleep(10)
-        voting_allowed = False
-        vote_result()
-        # Disable voting - End of voting
+        if checkCondition():
+            # Enable voting - initiate voting
+            voting_allowed = True
+            voting_phase()
+            time.sleep(10)
+            voting_allowed = False
+            vote_result()
+            # Disable voting - End of voting
+        else:
+            msg = ''' THANKS FOR PLAYING! Use /start to reset the game \U0001f47b '''
+            bot.send_message(room_id, msg)
 
 
 @bot.message_handler(commands=['pm'])
