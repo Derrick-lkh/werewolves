@@ -271,6 +271,7 @@ def start_game(message):
         else:
             msg = ''' THANKS FOR PLAYING! Use /start to reset the game \U0001f47b '''
             bot.send_message(room_id, msg)
+            return
 
 
 @bot.message_handler(commands=['pm'])
