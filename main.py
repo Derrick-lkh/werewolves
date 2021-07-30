@@ -4,7 +4,7 @@ import telebot
 from telebot import types
 from dotenv import load_dotenv
 import random
-import requests
+# import requests
 import time
 from UI import narrative_para
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -96,7 +96,7 @@ def night_actions():
     hacker_target = []
     has_dead = False
     shieldTarget = ""
-    gif_animation(room_id ,"granny")
+    # gif_animation(room_id ,"granny")
     bot.send_message(room_id, "\U0001f4a4 Night is falling in SAFTI. Everyone is going to sleep. Shut your eyes and don't peek \U0001f648")
     markupHacker = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard = True)
     markupAlive = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard = True)
@@ -135,21 +135,18 @@ def night_actions():
 
 def collate_night_actions():
     global night_actions_message
-    try:
-        if len(hacker_target) == 0:
-            night_actions_message = night_actions_message + "no one was killed \U0001f480"
-        else:
-            for i in Users:
-                if Users[i]["user_name"] in hacker_target:
-                    if Users[i]["user_name"] != shieldTarget:
-                        Users[i].update({"dead": True})
-                        night_actions_message = night_actions_message + "@" + str(Users[i]["user_name"]) + " was killed in action \U0001f480\n"
-                        gif_animation(room_id, "killer")
-                    else:
-                        night_actions_message = night_actions_message + "Shield prevented an attack \U0001f481\n"
-                        gif_animation(room_id, "shield")
-    except:
-        pass
+    if len(hacker_target) == 0:
+        night_actions_message = night_actions_message + "no one was killed \U0001f480"
+    else:
+        for i in Users:
+            if Users[i]["user_name"] in hacker_target:
+                if Users[i]["user_name"] != shieldTarget:
+                    Users[i].update({"dead": True})
+                    night_actions_message = night_actions_message + "@" + str(Users[i]["user_name"]) + " was killed in action \U0001f480\n"
+                    gif_animation(room_id, "killer")
+                else:
+                    night_actions_message = night_actions_message + "Shield prevented an attack \U0001f481\n"
+                    gif_animation(room_id, "shield")
     bot.send_message(room_id, night_actions_message)
 
 
@@ -217,7 +214,6 @@ def checkCondition():
     noOfHackers = 0
     noOfSurvivors = 0
     print("Checking win condition")
-    print(Users)
     for i in Users:
         if Users[i]["dead"] == False:
             noOfSurvivors += 1
@@ -248,8 +244,6 @@ def hack(message):
         hacker_target.append(str(message.text))
         msg = "You have selected to attack " + str(message.text)
         bot.reply_to(message, msg, reply_markup=reset_markup)
-    else:
-        gif(message.from_user.id, "bean")
 
 
 # FBI actions
@@ -262,9 +256,7 @@ def FBIDetect(message):
                 targetRole = Users[i]["roles"]
                 msg = str(target) + " identity is " + str(targetRole)
                 bot.reply_to(message, msg, reply_markup=reset_markup)
-    else:
-        gif_animation(message.chat.id, "bean")
-          
+
           
 # Sage actions
 def sage_res(message):
@@ -281,7 +273,7 @@ def sage_res(message):
                     Users[i]["revived"] = True
                     print("sage revive", i)
                     night_actions_message = night_actions_message + "Sage revived @" + sage_target + "\U0001f90c\n"
-                    gif_animation(i, "sageee")
+                    gif_animation(i, "sage")
                     bot.send_message(i, "You have been resurrected")
                     bot.reply_to(message, msg, reply_markup=reset_markup)
                     return
@@ -289,9 +281,7 @@ def sage_res(message):
                     msg = sage_target + " have been revived before. Choose another player to revive."
                     bot.reply_to(message, msg)
                     break
-            else:
-                gif_animation(message.chat.id, "bean")
-        
+            
   
 # Shield action
 def shield_prot(message):
@@ -300,15 +290,15 @@ def shield_prot(message):
         shieldTarget = str(message.text)
         msg = "You have selected to protect " + shieldTarget
         bot.reply_to(message, msg, reply_markup=reset_markup)
-    else:
-        gif_animation(message.chat.id, "bean")
-
+        
 
 def gif_animation(message ,name):
     file_name = name
     print(file_name)
     photo = open(file_name + '.gif', 'rb')
     bot.send_animation(message, photo)
+    time.sleep(1)
+    return
 
 
 def auth(message):
@@ -357,6 +347,7 @@ def start_game(message):
     random_roles()
 
     while checkCondition():
+        time.sleep(5)
         night_actions_allowed = True
         night_actions_message = "During the night, \U0001f346\n"
         night_actions()
@@ -365,6 +356,7 @@ def start_game(message):
         collate_night_actions()
         if checkCondition():
             countdown()
+            time.sleep(5)
             voting_phase()
             time.sleep(20)
             vote_result()
@@ -457,7 +449,7 @@ def test():
 def main():
     while True:
         try:
-            bot.polling(none_stop=False, interval=0, timeout=0)
+            bot.polling(none_stop=False, interval=0, timeout=20)
         except:
             pass
 
